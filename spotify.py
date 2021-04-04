@@ -9,6 +9,21 @@ SPOTIPY_CLIENT_SECRET  = "3cd6b42776f8489cb18bea190d7d98f5"
 
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET))
 
+def get_song_id(artist, song):
+    # assume that the first result is the correct song
+    # if song title has parentheticals, remove them
+    while '(' in song:
+        i1 = song.find('(')
+        i2 = song.find(')')
+        song = song[:i1] + song[i2+1:]
+    results = spotify.search(q=f'{artist} {song}', limit=1, type="track")
+    if len(results['tracks']['items']) == 0:
+        return ""
+    item = results['tracks']['items'][0]
+    song_uri = item['uri'][14:]
+    return song_uri
+
+
 def get_song_info(artist, song):
     # assume that the first result is the correct song
     results = spotify.search(q=f'{artist} {song}', limit=1, type="track")
@@ -54,8 +69,9 @@ def get_recs(recs, N=30):
     for rec, weight in recs:
         num_recs = int(round(N * weight * len(rec) / total_weight))
         if num_recs <= 0:
-            num_recs = 1
-            N -= 1
+            # num_recs = 1
+            # N -= 1
+            continue
         result.append(spotify.recommendations(seed_tracks=rec,limit=num_recs))
         total_recs += num_recs    
     return result, total_recs
