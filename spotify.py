@@ -42,7 +42,6 @@ def add_features(users_songs):
         user1_list = []
         for song in user_songs['song_uri']:
             row = spotify.audio_features(tracks=[song])
-            # row[0]['weight'] = user1_songs.loc[song].weight
             row = pd.DataFrame(row)
             user1_list.append(row)
         user1_df = pd.concat(user1_list)
