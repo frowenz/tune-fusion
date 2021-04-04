@@ -20,7 +20,7 @@ def default_playlist_name(names):
     s = ""
     for i in range(len(names) - 1):
         s += f"{names[i]}, "
-    s += f"and {names[i]}'s joint playlist"
+    s += f"and {names[i]}'s fused playlist"
     return s
 
 # Builds playlist and returns new Playlist object
