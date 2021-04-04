@@ -6,8 +6,6 @@ import pandas as pd
 
 SPOTIPY_CLIENT_ID = "21732af26e344c0ca09a681b2cde2253"
 SPOTIPY_CLIENT_SECRET  = "3cd6b42776f8489cb18bea190d7d98f5"
-# os.environ['SPOTIPY_CLIENT_ID'] = SPOTIPY_CLIENT_ID
-# os.environ['SPOTIPY_CLIENT_SECRET'] = SPOTIPY_CLIENT_SECRET
 
 spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET))
 
