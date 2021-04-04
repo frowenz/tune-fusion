@@ -69,9 +69,11 @@ def get_recs(recs, N=30):
     for rec, weight in recs:
         num_recs = int(round(N * weight * len(rec) / total_weight))
         if num_recs <= 0:
-            # num_recs = 1
-            # N -= 1
             continue
         result.append(spotify.recommendations(seed_tracks=rec,limit=num_recs))
-        total_recs += num_recs    
+        total_recs += num_recs
     return result, total_recs
+
+def info_from_id(song_id):
+    track = spotify.track(song_id)
+    return track

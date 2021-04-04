@@ -30,10 +30,10 @@ def create_joint_playlist(username, name2, input_playlist_name):
 
     # use last.fm data and spotify features to gather a list of song ids
     fused_list, err = script.get_shared_playlist(username, name2)
-    # check for error, returns an error message if users are not found
-    if err:
-        return fused_list, True
+    return (fused_list, input_playlist_name), err
+    
 
+def make_spotify_playlist(fused_list, username, playlist_name):
     # Authorize
     token = util.prompt_for_user_token(username, scope, client_id, secret_id, redirect_uri)
     if token:
@@ -42,10 +42,10 @@ def create_joint_playlist(username, name2, input_playlist_name):
         print("Can't get token for", username)
     
     # Create the new playlist and get the playlist id
-    pl = new_playlist(sp, username, input_playlist_name, 'Made with tune-fusion: https://uncommon.carolynmh.repl.co/testpage')
+    pl = new_playlist(sp, username, playlist_name, 'Made with tune-fusion: https://uncommon.carolynmh.repl.co/testpage')
     new_id = pl['id']
 
-    # Add Tracks 
+    # Add Tracks
     sp.user_playlist_add_tracks(username, new_id, tracks=fused_list, position=None)
     return "Success!", False
 
