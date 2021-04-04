@@ -36,27 +36,20 @@ def get_song_info(artist, song):
     popularity = item['popularity']
     return artist, artist_uri, song, song_uri, duration_ms, explicit, album, popularity
 
-def add_features(user1_songs, user2_songs):
-    user1_list = []
-    for song in user1_songs['song_uri']:
-        row = spotify.audio_features(tracks=[song])
-        # row[0]['weight'] = user1_songs.loc[song].weight
-        row = pd.DataFrame(row)
-        user1_list.append(row)
-    user1_df = pd.concat(user1_list)
-    user1_df['weight'] = user1_songs['weight']
+def add_features(users_songs):
+    user_dfs = []
+    for user_songs in users_songs:
+        user1_list = []
+        for song in user_songs['song_uri']:
+            row = spotify.audio_features(tracks=[song])
+            # row[0]['weight'] = user1_songs.loc[song].weight
+            row = pd.DataFrame(row)
+            user1_list.append(row)
+        user1_df = pd.concat(user1_list)
+        user1_df['weight'] = user_songs['weight']
+        user_dfs.append(user1_df)
 
-    user2_list = []
-    for song in user2_songs['song_uri']:
-        row = spotify.audio_features(tracks=[song])
-        # row[0]['weight'] = song.weight
-        row = pd.DataFrame(row)
-        user2_list.append(row)
-    user2_df = pd.concat(user2_list)
-    user2_df['weight'] = user2_songs['weight']
-
-    dfs = [user1_df, user2_df]
-    dfs = pd.concat(dfs)
+    dfs = pd.concat(user_dfs)
     # drop unnecessary features
     dfs.drop(['type','track_href','analysis_url','time_signature','duration_ms','uri','instrumentalness','liveness','loudness','key','mode'],1,inplace=True)
     dfs.set_index('id',inplace=True)
