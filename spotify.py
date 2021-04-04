@@ -24,15 +24,21 @@ def get_song_info(artist, song):
 def add_features(user1_songs, user2_songs):
     user1_list = []
     for song in user1_songs['song_uri']:
-        row = pd.DataFrame(spotify.audio_features(tracks=[song]))
+        row = spotify.audio_features(tracks=[song])
+        # row[0]['weight'] = user1_songs.loc[song].weight
+        row = pd.DataFrame(row)
         user1_list.append(row)
     user1_df = pd.concat(user1_list)
+    user1_df['weight'] = user1_songs['weight']
 
     user2_list = []
     for song in user2_songs['song_uri']:
-        row = pd.DataFrame(spotify.audio_features(tracks=[song]))
+        row = spotify.audio_features(tracks=[song])
+        # row[0]['weight'] = song.weight
+        row = pd.DataFrame(row)
         user2_list.append(row)
     user2_df = pd.concat(user2_list)
+    user2_df['weight'] = user2_songs['weight']
 
     dfs = [user1_df, user2_df]
     dfs = pd.concat(dfs)
@@ -41,16 +47,15 @@ def add_features(user1_songs, user2_songs):
     dfs.set_index('id',inplace=True)
     return dfs
 
-def get_recs(list_of_recs, adj_list_of_recs):
-    #Getting 1 recommended song from each cluster with less than 4 songs, 2 recommended songs from each cluster with 4-5 songs
-    list_of_recommendations = [0]*len(list_of_recs)
-    k = 0
-    list_of_recommendations = [0]*len(list_of_recs)
-    while k < len(list_of_recs):
-        if len(adj_list_of_recs[k]) < 4:
-            list_of_recommendations[k] = spotify.recommendations(seed_tracks=adj_list_of_recs[k],limit=1)
-        else:
-            list_of_recommendations[k] = spotify.recommendations(seed_tracks=adj_list_of_recs[k],limit=2)
-        k += 1
-    
-    return list_of_recommendations
+def get_recs(recs, N=30):
+    result = []
+    total_weight = sum([w * len(r) for r, w in recs])
+    total_recs = 0
+    for rec, weight in recs:
+        num_recs = int(round(N * weight * len(rec) / total_weight))
+        if num_recs <= 0:
+            num_recs = 1
+            N -= 1
+        result.append(spotify.recommendations(seed_tracks=rec,limit=num_recs))
+        total_recs += num_recs    
+    return result, total_recs
